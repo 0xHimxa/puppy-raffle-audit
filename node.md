@@ -1,0 +1,1 @@
+duplicate addresses are not allowed in a singile raffle.
