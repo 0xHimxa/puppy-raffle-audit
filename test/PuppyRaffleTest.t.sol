@@ -218,4 +218,67 @@ function testCantEnterWithDuplicatePlayersMany() public {
         puppyRaffle.withdrawFees();
         assertEq(address(feeAddress).balance, expectedPrizeAmount);
     }
+
+// testing first loop inside enterRaffle function will lead to DOS
+    function test_DenaialOfService_enterRaffle() public {
+     //here
+    address[] memory players = new address[](100);
+
+    uint160 playersNum = 100;
+
+//pushing 1000 players to my list first;
+
+ for (uint160 i = 0; i < playersNum; i++) {
+ 
+ players[i] = address(i);
+ 
+ }
+
+
+uint256 firstGasleftBefore = gasleft();
+      puppyRaffle.enterRaffle{value: entranceFee * players.length}(players);
+
+      uint256 firstGasLeftAfter = gasleft();
+
+      uint256 firstGasUsed = firstGasleftBefore -  firstGasLeftAfter;
+
+     console.log(firstGasUsed,":firstGasUsed"); 
+
+
+
+
+
+
+
+    address[] memory players2 = new address[](100);
+
+
+//pushing 1000 players to my list first;
+
+ for (uint160 i = 0; i < playersNum; i++) {
+ 
+ players2[i] = address(i + playersNum);
+ 
+ }
+
+
+uint256 secondGasleftBefore = gasleft();
+      puppyRaffle.enterRaffle{value: entranceFee * players2.length}(players2);
+
+      uint256 secondGasLeftAfter = gasleft();
+
+      uint256 secondGasUsed = secondGasleftBefore -  secondGasLeftAfter;
+
+     console.log(secondGasUsed,":secondGasUsed"); 
+
+
+
+assert(firstGasUsed < secondGasUsed);
+
+
+
+
+    }
+
+
 }

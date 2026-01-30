@@ -57,7 +57,7 @@ contract PuppyRaffle is ERC721, Ownable {
     /// @param _entranceFee the cost in wei to enter the raffle
     /// @param _feeAddress the address to send the fees to
     /// @param _raffleDuration the duration in seconds of the raffle
-    constructor(uint256 _entranceFee, address _feeAddress, uint256 _raffleDuration) ERC721("Puppy Raffle", "PR") {
+    constructor(uint256 _entranceFee, address _feeAddress, uint256 _raffleDuration) ERC721("Puppy Raffle", "PR") Ownable(msg.sender) {
         entranceFee = _entranceFee;
         feeAddress = _feeAddress;
         raffleDuration = _raffleDuration;
@@ -132,8 +132,10 @@ contract PuppyRaffle is ERC721, Ownable {
         uint256 prizePool = (totalAmountCollected * 80) / 100;
         uint256 fee = (totalAmountCollected * 20) / 100;
         totalFees = totalFees + uint64(fee);
+//q
 
-        uint256 tokenId = totalSupply();
+     //   uint256 tokenId = totalSupply();
+        uint256 tokenId = 10005;
 
         // We use a different RNG calculate from the winnerIndex to determine rarity
         uint256 rarity = uint256(keccak256(abi.encodePacked(msg.sender, block.difficulty))) % 100;
@@ -180,14 +182,14 @@ contract PuppyRaffle is ERC721, Ownable {
     }
 
     /// @notice this could be a constant variable
-    function _baseURI() internal pure returns (string memory) {
+    function _baseURI() internal pure override returns (string memory) {
         return "data:application/json;base64,";
     }
 
     /// @notice this function will return the URI for the token
     /// @param tokenId the Id of the NFT
     function tokenURI(uint256 tokenId) public view virtual override returns (string memory) {
-        require(_exists(tokenId), "PuppyRaffle: URI query for nonexistent token");
+       // require(_exists(tokenId), "PuppyRaffle: URI query for nonexistent token");
 
         uint256 rarity = tokenIdToRarity[tokenId];
         string memory imageURI = rarityToUri[rarity];
