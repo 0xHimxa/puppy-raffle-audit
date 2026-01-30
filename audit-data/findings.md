@@ -106,4 +106,4 @@ assert(firstGasUsed < secondGasUsed);
 
 
 
-**Recommended Mitigation:** 
+**Recommended Mitigation:**  

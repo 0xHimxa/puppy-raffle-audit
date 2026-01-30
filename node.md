@@ -55,3 +55,5 @@ the rarity selection is not actionally radom. it can be pridictable
 isactive players  will also get gas expensive: use mapping instead
 
 
+
+their is a reentrency   in  refund:
