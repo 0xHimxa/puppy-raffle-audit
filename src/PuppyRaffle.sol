@@ -129,12 +129,22 @@ contract PuppyRaffle is ERC721, Ownable {
     function selectWinner() external {
         require(block.timestamp >= raffleStartTime + raffleDuration, "PuppyRaffle: Raffle not over");
         require(players.length >= 4, "PuppyRaffle: Need at least 4 players");
+        
+        //@audit not random
+        // use chainlink vrf for sure randomness
         uint256 winnerIndex =
             uint256(keccak256(abi.encodePacked(msg.sender, block.timestamp, block.difficulty))) % players.length;
         address winner = players[winnerIndex];
+        //q why not do address(this).balance
         uint256 totalAmountCollected = players.length * entranceFee;
+       
+
+       //q is the 80% correct?
+       //q i bet there is an arretmetic error here...
         uint256 prizePool = (totalAmountCollected * 80) / 100;
         uint256 fee = (totalAmountCollected * 20) / 100;
+        
+        //q this is the total fee  the owner should be able to collect
         totalFees = totalFees + uint64(fee);
 //q
 
