@@ -57,7 +57,10 @@ contract PuppyRaffle is ERC721, Ownable {
     /// @param _entranceFee the cost in wei to enter the raffle
     /// @param _feeAddress the address to send the fees to
     /// @param _raffleDuration the duration in seconds of the raffle
-    constructor(uint256 _entranceFee, address _feeAddress, uint256 _raffleDuration) ERC721("Puppy Raffle", "PR") Ownable(msg.sender) {
+    constructor(uint256 _entranceFee, address _feeAddress, uint256 _raffleDuration)
+        ERC721("Puppy Raffle", "PR")
+        Ownable(msg.sender)
+    {
         entranceFee = _entranceFee;
         feeAddress = _feeAddress;
         raffleDuration = _raffleDuration;
@@ -87,7 +90,9 @@ contract PuppyRaffle is ERC721, Ownable {
             for (uint256 j = i + 1; j < players.length; j++) {
                 require(players[i] != players[j], "PuppyRaffle: Duplicate player");
             }
+
         }
+        //q if empty array, we stil emit event
         emit RaffleEnter(newPlayers);
     }
 
@@ -115,7 +120,6 @@ contract PuppyRaffle is ERC721, Ownable {
             }
             //q what if the player is at index 0
             //@audit if the player is at index 0, return 0, and the palyer might think they are not in the raffle
-
         }
         return 0;
     }
@@ -129,7 +133,7 @@ contract PuppyRaffle is ERC721, Ownable {
     function selectWinner() external {
         require(block.timestamp >= raffleStartTime + raffleDuration, "PuppyRaffle: Raffle not over");
         require(players.length >= 4, "PuppyRaffle: Need at least 4 players");
-        
+
         //@audit not random
         // use chainlink vrf for sure randomness
         uint256 winnerIndex =
@@ -137,43 +141,39 @@ contract PuppyRaffle is ERC721, Ownable {
         address winner = players[winnerIndex];
         //q why not do address(this).balance
         uint256 totalAmountCollected = players.length * entranceFee;
-       
 
-       //q is the 80% correct?
-       //q i bet there is an arretmetic error here...
+        //q is the 80% correct?
+        //q i bet there is an arretmetic error here...
         uint256 prizePool = (totalAmountCollected * 80) / 100;
         uint256 fee = (totalAmountCollected * 20) / 100;
-        
-        //q this is the total fee  the owner should be able to collect
-      
-      //@audit overflow here
 
-      // provide the proof of code ya self
-        
+        //q this is the total fee  the owner should be able to collect
+
+        //@audit overflow here
+
+        // provide the proof of code ya self
+
         //fix is the newer version of solidity bigger uints:uint256
         //18.4444444445454545
         //20e18 uint256
         // and we cast the unit256 t uint64:
-         //1.555555555555555
+        //1.555555555555555
 
-         // it will shruck, reduced the value of the unit256
-          //@audit unsafe type casting 
+        // it will shruck, reduced the value of the unit256
+        //@audit unsafe type casting
 
-        
-        
         totalFees = totalFees + uint64(fee);
-//q
+        //q
 
-
-          // @audit where do we increament the total supply 
-     //   uint256 tokenId = totalSupply();
+        // @audit where do we increament the total supply
+        //   uint256 tokenId = totalSupply();
         uint256 tokenId = 10005;
 
         // We use a different RNG calculate from the winnerIndex to determine rarity
         //@audit weak randomness
-          
-          //q if our tx pick a winner and we dont like it.... revert?
-          //q gas war.....
+
+        //q if our tx pick a winner and we dont like it.... revert?
+        //q gas war.....
 
         uint256 rarity = uint256(keccak256(abi.encodePacked(msg.sender, block.difficulty))) % 100;
         if (rarity <= COMMON_RARITY) {
@@ -199,8 +199,6 @@ contract PuppyRaffle is ERC721, Ownable {
 
     /// @notice this function will withdraw the fees to the feeAddress
     function withdrawFees() external {
-      
-      
         //@audit mishandling of it
         //slefdistruct can be use to force money in and no one will be able to withdraw fee
         require(address(this).balance == uint256(totalFees), "PuppyRaffle: There are currently players active!");
@@ -218,6 +216,11 @@ contract PuppyRaffle is ERC721, Ownable {
     }
 
     /// @notice this function will return true if the msg.sender is an active player
+    //@audit is this use anywhere?
+    //Impact: none
+    //likelihood: nono
+    // ---but it a watste of gas  I/G
+
     function _isActivePlayer() internal view returns (bool) {
         for (uint256 i = 0; i < players.length; i++) {
             if (players[i] == msg.sender) {
@@ -235,7 +238,7 @@ contract PuppyRaffle is ERC721, Ownable {
     /// @notice this function will return the URI for the token
     /// @param tokenId the Id of the NFT
     function tokenURI(uint256 tokenId) public view virtual override returns (string memory) {
-       // require(_exists(tokenId), "PuppyRaffle: URI query for nonexistent token");
+        // require(_exists(tokenId), "PuppyRaffle: URI query for nonexistent token");
 
         uint256 rarity = tokenIdToRarity[tokenId];
         string memory imageURI = rarityToUri[rarity];
