@@ -145,6 +145,10 @@ contract PuppyRaffle is ERC721, Ownable {
         uint256 fee = (totalAmountCollected * 20) / 100;
         
         //q this is the total fee  the owner should be able to collect
+      
+      //@audit overflow here
+
+      // provide the proof of code ya self
         totalFees = totalFees + uint64(fee);
 //q
 
