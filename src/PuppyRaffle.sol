@@ -149,13 +149,32 @@ contract PuppyRaffle is ERC721, Ownable {
       //@audit overflow here
 
       // provide the proof of code ya self
+        
+        //fix is the newer version of solidity bigger uints:uint256
+        //18.4444444445454545
+        //20e18 uint256
+        // and we cast the unit256 t uint64:
+         //1.555555555555555
+
+         // it will shruck, reduced the value of the unit256
+          //@audit unsafe type casting 
+
+        
+        
         totalFees = totalFees + uint64(fee);
 //q
 
+
+          // @audit where do we increament the total supply 
      //   uint256 tokenId = totalSupply();
         uint256 tokenId = 10005;
 
         // We use a different RNG calculate from the winnerIndex to determine rarity
+        //@audit weak randomness
+          
+          //q if our tx pick a winner and we dont like it.... revert?
+          //q gas war.....
+
         uint256 rarity = uint256(keccak256(abi.encodePacked(msg.sender, block.difficulty))) % 100;
         if (rarity <= COMMON_RARITY) {
             tokenIdToRarity[tokenId] = COMMON_RARITY;
@@ -166,8 +185,13 @@ contract PuppyRaffle is ERC721, Ownable {
         }
 
         delete players;
-        raffleStartTime = block.timestamp;
+        raffleStartTime = block.timestamp; // nice time stamp reset
         previousWinner = winner;
+
+        //q can we reenter somewhere?
+
+        //@audit if the winner wildnt get the money if their fallback was messed up!: prob lack payable or revert
+
         (bool success,) = winner.call{value: prizePool}("");
         require(success, "PuppyRaffle: Failed to send prize pool to winner");
         _safeMint(winner, tokenId);
