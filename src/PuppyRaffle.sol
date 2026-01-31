@@ -199,6 +199,10 @@ contract PuppyRaffle is ERC721, Ownable {
 
     /// @notice this function will withdraw the fees to the feeAddress
     function withdrawFees() external {
+      
+      
+        //@audit mishandling of it
+        //slefdistruct can be use to force money in and no one will be able to withdraw fee
         require(address(this).balance == uint256(totalFees), "PuppyRaffle: There are currently players active!");
         uint256 feesToWithdraw = totalFees;
         totalFees = 0;
