@@ -155,9 +155,15 @@ contract ReentrancyAttacker {
 **Proof of Concept:**
 1. Validators can know ahead of time the `block.timestamp` and `block.dificulty` and use that to predict when/how  to participate. See the [solidity bloc on prevandao](https://soliditydeveloper.com/prevrandao). `block.difficulty` was recnetly replaced with prevandao
 
-2. 
+2. Users can mine/manipulate thier `msg.sender` value to result in their address being used to generated the winner!
 
-**Recommended Mitigation:** 
+3. Users can revert the `selectWinner` transaction if they dont like the winner or resulting puppy.
+
+
+Using on-chain values as a randomness seed is a [well-documented acttack vector](https://blog.chain.link/random-number-generation-solidity/) in the blockchain space.
+
+
+**Recommended Mitigation:**  Consider using a cryptographic provable number generator such as Chainlink VRF.
 
 
 
