@@ -132,7 +132,46 @@ contract ReentrancyAttacker {
 
 ```
 
-### [M-#] Looping through players array to check for duplicates in `PuppyRaffle::enterRaffle` is a potential denial of service (DoS) attack, increamenting gas cost for feature entrans.
+
+
+### [H-2] Weak randomness in `PuppyRaffle::selectWinner` allow users to influence or pridict the winner and influence or predict the winning puppy.
+
+
+
+
+
+**Description:** Hashing `msg.sender`, `block.timestamp`, and `block.deficulty` together create a predictable find number. A predictable number is not a good randome number. Malicious users can manipulate the value or know them ahead of time to choose the winner of the raffle themselves.
+
+
+*Note:* This addtionally mean users could front-run this function and call `refund` if they see they are not the winner
+
+
+
+**Impact:**  Any user can influence the winner of the raffle , winnning the money and selecting the `rarest` puppy. Making the entire raffle worthless if it becomes a gas war as to who wins the raffle..
+
+
+
+
+**Proof of Concept:**
+1. Validators can know ahead of time the `block.timestamp` and `block.dificulty` and use that to predict when/how  to participate. See the [solidity bloc on prevandao](https://soliditydeveloper.com/prevrandao). `block.difficulty` was recnetly replaced with prevandao
+
+2. 
+
+**Recommended Mitigation:** 
+
+
+
+
+
+
+
+
+
+
+
+
+
+### [M-1] Looping through players array to check for duplicates in `PuppyRaffle::enterRaffle` is a potential denial of service (DoS) attack, increamenting gas cost for feature entrans.
 
 //this accuallly create a issue in front runing: check about that
 
