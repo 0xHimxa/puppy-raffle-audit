@@ -244,6 +244,44 @@ assert(firstGasUsed < secondGasUsed);
 
 
 
+# Low
+
+
+### [L-1] `PuppyRaffle::getActivePlayerIndex` returns 0 forn non-exitant players and for players at index 0,causing a player at index 0 to incorrectly  think they have not entered the raffle.
+
+
+**Description:**  if a player is in the `PuppyRaffle::players` array at 0 this will return 0, but accoring to the natspec it will also return 0 if the player is not in the array.
+
+
+```javascript
+    /// @return the index of the player in the array, if they are not active, it returns 0
+
+ function getActivePlayerIndex(address player) external view returns (uint256) {
+        for (uint256 i = 0; i < players.length; i++) {
+            if (players[i] == player) {
+                return i;
+            }
+            //q what if the player is at index 0
+            //@audit if the player is at index 0, return 0, and the palyer might think they are not in the raffle
+        }
+        return 0;
+    }
+
+```
+
+**Impact:** A player at index 0 may incorrectly  think they have not entered the raffle, and attempt to enter again, wasting gas.
+
+**Proof of Concept:**
+1. User enter raffle, they are the first entrant
+2. `PuppyRaffle::getActivePayerIndex` retuns 0
+3. User thinks they have not enterd correctly due to the unction documentation
+
+**Recommended Mitigation:**  The easiest recommendation would be to revert if a player is not in the array instead of returning 0.
+
+ You could also reserve the 0th position for any competition , but the better solution might be to return an `int256` where the function returns -1 if the player is not active
+
+
+
 
 
 # Gas
