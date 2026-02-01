@@ -170,6 +170,34 @@ Using on-chain values as a randomness seed is a [well-documented acttack vector]
 
 
 
+### [H-3] Interger overflow of `PuppyRaffle::totalFees` loses fees
+
+**Description:** In solidity versions prior to `0.8.0` intergers where subject to intergers overflows.
+
+```javascript
+uint256 myVar = type(uint64).max
+//18446744073709551615
+myVar = myVar + 1
+//MyVar will be zero
+```
+
+
+
+**Impact:**  In `PuppyRaffle::selectWinner`,`totalFees` are accumulated for the `feeAddress` to collect latter in `PuppyRaffle::withdrawFees`. However, if the  `totalFees` variables overFlows, the `feeAddress` may not collect  the coorect amount of fees, leaving fees permanently stuck in the contract.
+
+
+
+
+**Proof of Concept:**
+
+**Recommended Mitigation:** 
+
+
+
+
+
+
+
 
 
 
@@ -289,6 +317,37 @@ assert(firstGasUsed < secondGasUsed);
 
 
 
+
+
+### [M-2] Smart contracts wallets raffle winners without a `receive` or a `fallback` function will block the start of a new contst
+
+**Description:** The `PuppyRaffle::selectWinner` function is responsible for  resetting the lottery. However, if the winner is a smartContract wallet that reject payment, the lottery would  not be able to restart.
+
+Users could easily call the `selectWinner` function again and non-wallet entrants could enter, it could cause alot due to the dublicate check and  a lottery reset could get very challenging.
+
+
+
+**Impact:** The `PuppyRaffle::selectWinner` function  could revert many times, making  a lottery reset difficult.
+
+Also, true winners would not get paid out and someone else could take their money!
+
+**Proof of Concept:**
+
+1. 10 smart contract wallet ente the lottery without a fallback or  receive function.
+2. The lottery ends
+3. the `selectWinner` function wouldnt work, even though the lottery is over!
+
+**Recommended Mitigation:** 
+
+
+
+
+
+
+
+
+
+
 # Low
 
 
@@ -372,6 +431,28 @@ its best to keep code clean and follow CEI [Checks, Effects, Interactions]
 +       (bool success,) = winner.call{value: prizePool}("");
 +       require(success, "PuppyRaffle: Failed to send prize pool to winner");
 ```
+
+
+### [I-2] Use of "magic numbers" numbers is discouraged
+
+
+It can be confusing to see numbers literals in a codebase, and it much more readable if the numbers are given a name.
+Examples
+
+```javascript
+  uint256 prizePool = (totalAmountCollected * 80) / 100;
+        uint256 fee = (totalAmountCollected * 20) / 100;
+
+```
+
+Instead, you could use:
+ ```
+ uint256 public constant PRIZE_POOL_PERCENTAGE = 80;
+  uint256 public constant FEE_PERCENTAGE = 20;
+ uint256 public constant POOL_PRECISION = 100;
+
+
+ ``` 
 
 
 
