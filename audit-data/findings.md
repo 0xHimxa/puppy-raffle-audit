@@ -1,3 +1,5 @@
+
+
 ### [M-#] Looping through players array to check for duplicates in `PuppyRaffle::enterRaffle` is a potential denial of service (DoS) attack, increamenting gas cost for feature entrans.
 
 //this accuallly create a issue in front runing: check about that
@@ -107,6 +109,42 @@ assert(firstGasUsed < secondGasUsed);
 
 
 **Recommended Mitigation:**  
+
+
+
+
+
+# Gas
+### [G-1] Unchanged state variable should be declared constant or immutable
+
+Reading from storage is much more expensive than reading from a constant or immutable variable.
+
+instances
+- `PuppyRaffle::raffleDauration` should be `immutable`
+- `PuppyRaffle::commonImageUri` should be `constant`
+- `PuppyRaffle::rareImageUri` should be `constant`
+- `PuppyRaffle::legendaryImageUri` should be `constant`
+
+
+### [G-2] storage varaible in a loop should be cached
+
+Everytime you called  `players.length` you read from storage, as suppose to memory which is more gas efficient.
+
+```diff
++ uint256 playersLength = players.length;
+
+-  for (uint256 i = 0; i < players.length - 1; i++) {
++  for (uint256 i = 0; i < playersLength - 1; i++) {
+  
+-            for (uint256 j = i + 1; j < players.length; j++) {
++            for (uint256 j = i + 1; j < playersLength; j++) {
+
+                require(players[i] != players[j], "PuppyRaffle: Duplicate player");
+            }
+
+        }
+```
+
 
 
 
