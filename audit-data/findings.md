@@ -316,6 +316,20 @@ Everytime you called  `players.length` you read from storage, as suppose to memo
 ```
 
 
+### [I-1] `PuppyRaffle::selectWinner` does not follow CEI [Checks, Effects, Interactions] which is not best practice
+
+its best to keep code clean and follow CEI [Checks, Effects, Interactions]
+
+```diff
+- (bool success,) = winner.call{value: prizePool}("");
+-        require(success, "PuppyRaffle: Failed to send prize pool to winner");
+        _safeMint(winner, tokenId);
++       (bool success,) = winner.call{value: prizePool}("");
++       require(success, "PuppyRaffle: Failed to send prize pool to winner");
+```
+
+
+
 
 
 
